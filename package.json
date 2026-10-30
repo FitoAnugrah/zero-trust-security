@@ -4,6 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node gateway/server.js",
+    "start:gateway": "node gateway/server.js",
+    "start:nilai": "node service-nilai/server.js",
+    "start:transkrip": "node service-transkrip/server.js",
+    "seed": "node database/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

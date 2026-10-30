@@ -6,6 +6,7 @@ const db = require('../database/db');
 
 require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
+  override: true,
 });
 
 const app = express();
@@ -74,7 +75,7 @@ app.get('/nilai', async (req, res) => {
 
     if (req.claims.role === 'mahasiswa') {
       [rows] = await db.execute(
-        `SELECT g.id, c.class_code, c.course_name,
+        `SELECT g.id, g.class_id, c.class_code, c.course_name,
                 g.score, g.is_final
          FROM grades g
          JOIN classes c ON c.id = g.class_id
@@ -84,7 +85,7 @@ app.get('/nilai', async (req, res) => {
       );
     } else {
       [rows] = await db.execute(
-        `SELECT g.id, c.class_code, c.course_name,
+        `SELECT g.id, g.class_id, c.class_code, c.course_name,
                 g.student_id, g.score, g.is_final
          FROM grades g
          JOIN classes c ON c.id = g.class_id

@@ -8,10 +8,12 @@ const { evaluatePolicy } = require('./policy');
 
 require('dotenv').config({
   path: path.resolve(__dirname, '../.env'),
+  override: true,
 });
 
 const app = express();
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, '../frontend')));
 
 const PORT = Number(process.env.PORT_GATEWAY || 3000);
 
@@ -380,6 +382,24 @@ app.use(async (req, res) => {
         : decision.service === 'transkrip'
           ? Number(process.env.PORT_TRANSKRIP || 3002)
           : null;
+
+    if (decision.service === 'gateway' && req.method === 'GET' && req.path === '/admin/audit') {
+      const requestedLimit = Number(req.query.limit || 30);
+      const limit = Number.isInteger(requestedLimit)
+        ? Math.min(Math.max(requestedLimit, 1), 100)
+        : 30;
+
+      const [rows] = await db.execute(
+        `SELECT id, event_time, subject, endpoint, device_id,
+                decision, reason
+         FROM audit_logs
+         ORDER BY id DESC
+         LIMIT ?`,
+        [limit]
+      );
+
+      return res.json({ data: rows });
+    }
 
     if (!targetPort) {
       return res.status(500).json({

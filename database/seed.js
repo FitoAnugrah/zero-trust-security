@@ -26,6 +26,7 @@ const users = [
   {
     username: 'mhs1',
     name: 'Mahasiswa 1',
+    nim: '2024001',
     role: 'mahasiswa',
     password: 'Mhs123!',
     device: 'DEV-MHS-001',
@@ -33,6 +34,7 @@ const users = [
   {
     username: 'mhs2',
     name: 'Mahasiswa 2',
+    nim: '2024002',
     role: 'mahasiswa',
     password: 'Mhs456!',
     device: 'DEV-MHS-002',
@@ -40,6 +42,7 @@ const users = [
   {
     username: 'mhs3',
     name: 'Mahasiswa 3',
+    nim: '2024003',
     role: 'mahasiswa',
     password: 'Mhs789!',
     device: 'DEV-MHS-003',
@@ -60,13 +63,14 @@ async function seed() {
 
       await connection.execute(
         `INSERT INTO users
-          (username, full_name, role, password_hash)
-         VALUES (?, ?, ?, ?)
+          (username, full_name, nim, role, password_hash)
+         VALUES (?, ?, ?, ?, ?)
          ON DUPLICATE KEY UPDATE
           full_name = VALUES(full_name),
+          nim = VALUES(nim),
           role = VALUES(role),
           password_hash = VALUES(password_hash)`,
-        [user.username, user.name, user.role, passwordHash]
+        [user.username, user.name, user.nim || null, user.role, passwordHash]
       );
 
       const [rows] = await connection.execute(

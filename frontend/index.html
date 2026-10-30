@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f3f6f5">
+    <meta name="description" content="ZeroTrust Campus — akses kampus yang diverifikasi untuk setiap pengguna dan perangkat.">
+    <title>ZeroTrust Campus — Access Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <section class="login-screen" id="login-screen" aria-labelledby="login-title">
+      <div class="login-aside">
+        <a class="brand brand-light" href="/" aria-label="ZeroTrust Campus">
+          <span class="brand-mark"><i></i><i></i><i></i></span>
+          <span>zero<span class="brand-light-name">trust</span><small>campus gateway</small></span>
+        </a>
+        <div class="login-message">
+          <p class="eyebrow">IDENTITAS · PERANGKAT · KONTEKS</p>
+          <h1 id="login-title">Setiap akses<br>punya alasan.</h1>
+          <p>Verifikasi ulang identitas, perangkat terdaftar, dan kebijakan sebelum data akademik dibuka.</p>
+        </div>
+        <div class="login-foot"><span class="live-dot"></span> Gateway siap menerima sesi terverifikasi</div>
+      </div>
+      <div class="login-form-wrap">
+        <form class="login-form" id="login-form">
+          <p class="eyebrow">ZERO TRUST ACCESS</p>
+          <h2>Masuk ke workspace</h2>
+          <p class="form-intro">Gunakan identitas dan perangkat yang sudah didaftarkan.</p>
+          <label class="field"><span>Username</span><input class="input" name="username" autocomplete="username" required placeholder="nama.pengguna"></label>
+          <label class="field"><span>Password</span><input class="input" name="password" type="password" autocomplete="current-password" required placeholder="Masukkan password"></label>
+          <label class="field"><span>ID perangkat terdaftar</span><input class="input mono" name="deviceId" autocomplete="off" required placeholder="Contoh: DEV-DOSEN-001"><small>Permintaan tanpa perangkat yang dikenali akan ditolak.</small></label>
+          <p class="form-error" id="login-error" role="alert" hidden></p>
+          <button class="button button-dark login-submit" type="submit"><span>Verifikasi dan masuk</span><span aria-hidden="true">↗</span></button>
+          <p class="login-note"><span class="lock-mark" aria-hidden="true">⌑</span> Sesi memakai access token 10 menit dan terikat ke perangkat ini.</p>
+        </form>
+      </div>
+    </section>
+
+    <div class="app" id="app" hidden>
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#overview" aria-label="ZeroTrust Campus home">
+          <span class="brand-mark"><i></i><i></i><i></i></span>
+          <span>zero<span class="brand-strong">trust</span><small>campus gateway</small></span>
+        </a>
+        <div class="workspace"><span class="workspace-glyph">Z</span><span><b>Universitas Nusantara</b><small>Academic workspace</small></span><span class="workspace-chevron">⌄</span></div>
+        <p class="nav-label">WORKSPACE</p>
+        <nav class="navigation" aria-label="Navigasi utama">
+          <button class="nav-item" data-view="overview" aria-current="page"><span class="nav-icon">◫</span>Ikhtisar</button>
+          <button class="nav-item" data-view="grades"><span class="nav-icon">▤</span>Nilai</button>
+          <button class="nav-item" data-view="transcript"><span class="nav-icon">▧</span>Transkrip</button>
+          <button class="nav-item" data-view="audit" hidden><span class="nav-icon">⌁</span>Audit log</button>
+        </nav>
+        <div class="sidebar-bottom">
+          <div class="sidebar-security"><span class="mini-shield" aria-hidden="true"></span><span><b>Zero trust aktif</b><small>Policy diperiksa per request</small></span></div>
+          <div class="profile-row"><span class="avatar" id="user-avatar">ZT</span><span class="profile-copy"><b id="user-name">Pengguna</b><small id="user-role">—</small></span><button class="logout-button" id="logout-button">Keluar</button></div>
+        </div>
+      </aside>
+
+      <main class="main-shell">
+        <header class="topbar">
+          <button class="mobile-menu" id="menu-button" aria-label="Buka navigasi"><span class="hamburger" aria-hidden="true"></span></button>
+          <div class="breadcrumbs"><span>Workspace</span><span class="crumb-sep">/</span><b id="breadcrumb-title">Ikhtisar</b></div>
+          <div class="topbar-right"><button class="button token-refresh" id="refresh-token-button">Perbarui token</button><span class="environment"><i></i>PROTECTED ENVIRONMENT</span><span class="top-divider"></span><button class="user-mini" id="user-menu"><span class="avatar avatar-small" id="top-avatar">ZT</span><span id="top-name">Pengguna</span><span class="chevron">⌄</span></button></div>
+        </header>
+        <div class="sheet">
+          <div class="page-content">
+            <section class="view" id="view-overview">
+              <div class="page-title-row">
+                <div><p class="eyebrow">SECURITY WORKSPACE <span class="title-dot">·</span> AKADEMIK</p><h1>Akses tetap diverifikasi.</h1><p class="page-subtitle">Setiap permintaan dinilai berdasarkan identitas, perangkat, peran, dan konteks.</p></div>
+                <button class="button button-outline" id="refresh-button"><span class="refresh-icon">↻</span> Perbarui status</button>
+              </div>
+              <div class="session-banner">
+                <div class="session-seal" aria-hidden="true"></div>
+                <div class="session-message"><p class="eyebrow">SESI TERVERIFIKASI</p><strong id="session-headline">Identitas dan perangkat dikenali</strong><span id="session-detail">Kebijakan akan diperiksa kembali pada setiap permintaan.</span><span class="token-expiry-inline">Access token berlaku sampai <b id="token-expiry">—</b></span></div>
+                <div class="session-meta"><span>PERANGKAT</span><code id="session-device">—</code><span class="session-status"><i></i>AKTIF</span></div>
+              </div>
+
+              <div class="section-heading"><div><h2>Jalur keputusan akses</h2><p>Empat pemeriksaan sebelum request diteruskan.</p></div><span class="freshness"><i class="live-dot"></i> Gateway online</span></div>
+              <div class="policy-flow" aria-label="Empat pemeriksaan kebijakan">
+                <article class="policy-step"><span class="step-number">01</span><span class="step-symbol symbol-identity">◎</span><div><h3>Identitas</h3><p>JWT ditandatangani</p></div></article>
+                <span class="flow-line"></span>
+                <article class="policy-step"><span class="step-number">02</span><span class="step-symbol symbol-device">⌘</span><div><h3>Perangkat</h3><p>Device terdaftar</p></div></article>
+                <span class="flow-line"></span>
+                <article class="policy-step"><span class="step-number">03</span><span class="step-symbol symbol-policy">≋</span><div><h3>Kebijakan</h3><p>Role &amp; kepemilikan</p></div></article>
+                <span class="flow-line"></span>
+                <article class="policy-step"><span class="step-number">04</span><span class="step-symbol symbol-service">↗</span><div><h3>Service</h3><p>Gateway meneruskan</p></div></article>
+              </div>
+
+              <div class="dashboard-grid">
+                <section class="content-panel access-panel">
+                  <div class="panel-heading"><div><p class="eyebrow">REQUEST TRACE</p><h2>Aktivitas sesi</h2></div><span class="trace-count" id="trace-count">0 request</span></div>
+                  <div class="trace-list" id="trace-list"><div class="trace-empty"><span class="empty-mark">⌁</span><div><strong>Belum ada permintaan</strong><span>Aktivitas yang Anda lakukan selama sesi ini muncul di sini.</span></div></div></div>
+                  <div class="panel-footnote"><span class="tiny-lock">◈</span> Jejak sesi ini tersimpan lokal di browser. Audit server tersedia pada database gateway.</div>
+                </section>
+                <section class="content-panel boundary-panel">
+                  <div class="panel-heading"><div><p class="eyebrow">SERVICE BOUNDARY</p><h2>Ruang lingkup akses</h2></div><span class="boundary-glyph">⌖</span></div>
+                  <div class="service-row"><span class="service-code">GW</span><div><strong>API Gateway</strong><small>Policy enforcement point</small></div><span class="service-state"><i></i>AKTIF</span></div>
+                  <div class="service-row"><span class="service-code">01</span><div><strong>Service Nilai</strong><small>Data dibatasi per peran</small></div><span class="service-state"><i></i>TERLINDUNGI</span></div>
+                  <div class="service-row"><span class="service-code">02</span><div><strong>Service Transkrip</strong><small>Akses sesuai kepemilikan</small></div><span class="service-state"><i></i>TERLINDUNGI</span></div>
+                  <div class="boundary-note"><span>i</span><p>Service memverifikasi token dan rahasia gateway secara independen.</p></div>
+                </section>
+              </div>
+
+              <section class="principle-strip"><span class="principle-mark">ZT</span><div><strong>Never trust. Always verify.</strong><span>Session singkat · Device-bound · Least privilege · Setiap keputusan dicatat</span></div><span class="principle-code">POLICY ENGINE <b>v1.0</b></span></section>
+            </section>
+
+            <section class="view" id="view-grades" hidden>
+              <div class="page-title-row compact-title"><div><p class="eyebrow">DATA AKADEMIK <span class="title-dot">·</span> SERVICE NILAI</p><h1>Nilai per kelas</h1><p class="page-subtitle">Data yang tampil sudah dibatasi berdasarkan peran dan kelas yang diampu.</p></div><button class="button button-outline" data-refresh="grades"><span class="refresh-icon">↻</span> Muat ulang</button></div>
+              <div class="data-notice"><span class="notice-symbol">◈</span><p><strong>Akses berbasis kebijakan</strong><span>Gateway dan Service Nilai memverifikasi token, peran, dan batas akses sebelum data dikirim.</span></p><span class="notice-role" id="grades-role">—</span></div>
+              <section class="content-panel table-panel"><div class="panel-heading"><div><p class="eyebrow">REKAMAN YANG DAPAT DIAKSES</p><h2>Daftar nilai</h2></div><span class="trace-count" id="grade-count">Memuat…</span></div><div class="table-wrap" id="grades-table"><div class="table-loading"><span class="spinner"></span>Memverifikasi akses ke Service Nilai…</div></div></section>
+            </section>
+
+            <section class="view" id="view-transcript" hidden>
+              <div class="page-title-row compact-title"><div><p class="eyebrow">DATA AKADEMIK <span class="title-dot">·</span> SERVICE TRANSKRIP</p><h1>Transkrip akademik</h1><p class="page-subtitle" id="transcript-subtitle">Cari transkrip berdasarkan NIM. Akses mahasiswa dibatasi ke transkripnya sendiri.</p></div></div>
+              <form class="lookup-form" id="transcript-form"><label class="lookup-label" for="transcript-nim">Nomor Induk Mahasiswa</label><div class="lookup-controls"><div class="search-input"><span>⌕</span><input id="transcript-nim" class="input mono" placeholder="Masukkan NIM" required></div><button class="button button-dark" type="submit">Cari transkrip <span aria-hidden="true">↗</span></button></div><p class="lookup-hint" id="transcript-hint">Administrator dapat mencari transkrip mahasiswa. Setiap pencarian tetap diperiksa oleh policy engine.</p></form>
+              <div id="transcript-result"></div>
+            </section>
+            <section class="view" id="view-audit" hidden>
+              <div class="page-title-row compact-title"><div><p class="eyebrow">SECURITY OPERATIONS <span class="title-dot">·</span> GATEWAY</p><h1>Audit log</h1><p class="page-subtitle">Keputusan akses yang dicatat server untuk identitas dan perangkat.</p></div><button class="button button-outline" id="refresh-audit-button"><span class="refresh-icon">↻</span> Muat ulang</button></div>
+              <div class="data-notice"><span class="notice-symbol">◈</span><p><strong>Data audit server</strong><span>Endpoint ini dilindungi policy admin, JWT, dan verifikasi perangkat oleh Gateway.</span></p><span class="notice-role">ADMIN ONLY</span></div>
+              <section class="content-panel table-panel"><div class="panel-heading"><div><p class="eyebrow">ALLOW &amp; DENY</p><h2>Keputusan terbaru</h2></div><span class="trace-count" id="audit-count">Memuat…</span></div><div class="table-wrap" id="audit-table"><div class="table-loading"><span class="spinner"></span>Mengambil audit log dari server…</div></div></section>
+            </section>
+            <footer class="app-footer"><span>ZeroTrust Campus <span class="footer-sep">/</span> Academic Access Console</span><span>AKSES MINIMUM · VERIFIKASI BERKELANJUTAN</span></footer>
+          </div>
+        </div>
+      </main>
+      <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="true"></div>
+    </div>
+  </body>
+</html>

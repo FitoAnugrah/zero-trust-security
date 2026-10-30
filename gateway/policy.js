@@ -15,6 +15,15 @@ async function evaluatePolicy({ method, pathname, claims, db }) {
     reason,
   });
 
+  // Audit records contain sensitive access metadata; only administrators may read them.
+  if (method === 'GET' && pathname === '/admin/audit') {
+    if (role === 'admin') {
+      return allow('gateway', 'Administrator boleh melihat audit log');
+    }
+
+    return deny('Hanya admin yang boleh melihat audit log');
+  }
+
   // Sinkronisasi transkrip hanya untuk token service.
   if (method === 'POST' && pathname === '/transkrip/sinkron') {
     if (
